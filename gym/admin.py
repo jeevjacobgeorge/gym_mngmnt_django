@@ -5,7 +5,7 @@ class CustomerAdmin(admin.ModelAdmin):
     list_display = ('name', 'gender', 'blood_group', 'height', 'weight', 'bmi', 'membership_type', 'admission_number', 'date_of_admission', 'is_active', 'months_remaining')
     search_fields = ('name', 'admission_number', 'date_of_admission')
     list_filter = ('gender', 'membership_type')
-    readonly_fields = ('admission_number', 'bmi', 'is_active', 'months_remaining')
+    readonly_fields = ('admission_number', 'bmi', 'months_remaining')
 
 class FeeDetailAdmin(admin.ModelAdmin):
     list_display = ('customer', 'amount_paid', 'date_of_payment', 'month')

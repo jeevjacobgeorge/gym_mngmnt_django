@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class Customer(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),
@@ -38,7 +39,6 @@ class Customer(models.Model):
     admission_number = models.PositiveIntegerField(unique=True, editable=False, default=0)
     unique_id = models.AutoField(primary_key=True)
     date_of_admission = models.DateField(default=timezone.now)
-    
     @property
     def is_active(self):
         current_year = timezone.now().year
@@ -63,11 +63,39 @@ class Customer(models.Model):
                 self.admission_number = 10000
 
         self.bmi = self.weight / (self.height/100) ** 2
+
+
         
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
+
+    def pay_fees(self, amount, months, start_month=None):
+        """
+        Function to pay fees for multiple months.
+        :param amount: Total amount paid
+        :param months: Number of months paid for
+        :param start_month: Optional start month, defaults to the current month
+        """
+        if not start_month:
+            start_month = timezone.now().month
+
+        month = start_month
+        year = timezone.now().year
+        amount_per_month = amount / months
+
+        for _ in range(months):
+            if month > 12:
+                month = 1
+                year += 1
+            FeeDetail.objects.create(
+                customer=self,
+                amount_paid=amount_per_month,
+                date_of_payment=timezone.now(),
+                month=month,
+            )
+            month += 1
 
 class FeeDetail(models.Model):
     MONTH_CHOICES = [

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pay Fees</title>
+</head>
+<body>
+    <h1>Pay Fees for {{ customer.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Pay Fees</button>
+    </form>
+    <a href="{% url 'customer_list' %}">Back to Customer List</a>
+</body>
+</html>
