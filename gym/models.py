@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-
 class Customer(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),
@@ -36,9 +35,10 @@ class Customer(models.Model):
     weight = models.FloatField(help_text='Weight in kilograms')
     bmi = models.FloatField(editable=False)
     membership_type = models.CharField(max_length=2, choices=MEMBERSHIP_CHOICES)
-    admission_number = models.PositiveIntegerField(unique=True, editable=False, default=0)
+    admission_number = models.PositiveIntegerField(editable=False, default=0)
     unique_id = models.AutoField(primary_key=True)
     date_of_admission = models.DateField(default=timezone.now)
+
     @property
     def is_active(self):
         current_year = timezone.now().year
@@ -56,16 +56,13 @@ class Customer(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.admission_number:
-            last_customer = Customer.objects.all().order_by('admission_number').last()
+            last_customer = Customer.objects.filter(gender=self.gender).order_by('admission_number').last()
             if last_customer:
                 self.admission_number = last_customer.admission_number + 1
             else:
                 self.admission_number = 10000
 
-        self.bmi = self.weight / (self.height/100) ** 2
-
-
-        
+        self.bmi = self.weight / (self.height / 100) ** 2
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -116,16 +113,16 @@ class FeeDetail(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     date_of_payment = models.DateField(default=timezone.now)
+    category = models.CharField(choices=Customer.MEMBERSHIP_CHOICES, max_length=2, default=Customer.WEIGHT_TRAINING)
     month = models.PositiveSmallIntegerField(choices=MONTH_CHOICES, default=timezone.now().month)
+    year = models.IntegerField(default=timezone.now().year)
 
     def __str__(self):
         return f"{self.customer.name} - {self.get_month_display()} - {self.amount_paid}"
 
-class YearlyFee(models.Model):
-    year = models.PositiveIntegerField()
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
-    month = models.PositiveIntegerField(help_text='Month number (1 for January, 2 for February, etc.)')
+class CategoryTable(models.Model):
+    name = models.CharField(choices=Customer.MEMBERSHIP_CHOICES, max_length=2, default=Customer.WEIGHT_TRAINING)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.customer.name} - {self.year} - {self.month}"
+        return self.get_name_display()

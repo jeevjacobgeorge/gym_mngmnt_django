@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Customer, FeeDetail, YearlyFee
+from .models import Customer, FeeDetail, CategoryTable
 
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('name', 'gender', 'blood_group', 'height', 'weight', 'bmi', 'membership_type', 'admission_number', 'date_of_admission', 'is_active', 'months_remaining')
@@ -12,11 +12,8 @@ class FeeDetailAdmin(admin.ModelAdmin):
     search_fields = ('customer__name', 'date_of_payment')
     list_filter = ('date_of_payment', 'month')
 
-class YearlyFeeAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'year', 'amount_paid', 'month')
-    search_fields = ('customer__name', 'year')
-    list_filter = ('year', 'month')
 
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(FeeDetail, FeeDetailAdmin)
-admin.site.register(YearlyFee, YearlyFeeAdmin)
+admin.site.register(CategoryTable)
+
