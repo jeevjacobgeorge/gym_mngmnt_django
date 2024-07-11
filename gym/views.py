@@ -31,7 +31,6 @@ def add_customer(request):
         weight = request.POST.get('weight', None)  # Default to None if not provided
         blood_group = request.POST.get('bloodGroup')
         doj = request.POST.get('doj')
-
         # Validate and save form data
         try:
             new_customer = Customer(
@@ -47,8 +46,7 @@ def add_customer(request):
             new_customer.save()
             return render(request,'gym/success.html')  # Replace 'success' with the URL name for success page
         except ValueError:
-            # Handle invalid form data (e.g., height/weight not numeric)
-            pass
+           return render(request,'gym/add_customer.html', {'error': 'Invalid input. Please enter valid data.'})
 
    
 

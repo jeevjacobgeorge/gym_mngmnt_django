@@ -8,15 +8,25 @@ class Customer(models.Model):
     ]
 
     BLOOD_GROUP_CHOICES = [
+        ('O+', 'O+'),
+        ('O-', 'O-'),
         ('A+', 'A+'),
         ('A-', 'A-'),
         ('B+', 'B+'),
         ('B-', 'B-'),
         ('AB+', 'AB+'),
         ('AB-', 'AB-'),
-        ('O+', 'O+'),
-        ('O-', 'O-'),
+        ('A1+', 'A1+'),
+        ('A1-', 'A1-'),
+        ('A2+', 'A2+'),
+        ('A2-', 'A2-'),
+        ('A1B+', 'A1B+'),
+        ('A1B-', 'A1B-'),
+        ('A2B+', 'A2B+'),
+        ('A2B-', 'A2B-'),
+        ('BOMBAY', 'BOMBAY'),
     ]
+
 
     WEIGHT_TRAINING = 'WT'
     CARDIO = 'C'
@@ -29,13 +39,13 @@ class Customer(models.Model):
     ]
 
     unique_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,blank=False)
     phone_no = models.CharField(max_length=10, blank=True)
     email = models.EmailField(null=True, blank=True)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES,blank=False)
     height = models.FloatField(help_text='Height in centimeters', null=True, blank=True)
     weight = models.FloatField(help_text='Weight in kilograms', null=True, blank=True)
-    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
+    blood_group = models.CharField(max_length=6, choices=BLOOD_GROUP_CHOICES,blank=False)
     bmi = models.FloatField(editable=False, null=True, blank=True)
     admission_number = models.PositiveIntegerField(editable=False, default=0)
     date_of_admission = models.DateField(default=timezone.now)

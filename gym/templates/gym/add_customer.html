@@ -20,6 +20,12 @@
                 <a href="#"><li><i class="fa-solid fa-circle-info" style="color: #9a9a9a;"></i>Fee Details</li></a>
             </nav>
         </div>
+        {% if error %}
+        <div id="errorPopup" class="popup active">
+            <p>{{ error }}</p>
+            <button onclick="closePopup()">Close</button>
+        </div>
+        {% endif %}
         <div class="content">
             <div class="header">
                 <h1>New Customer</h1>
@@ -38,23 +44,24 @@
                                 <label for="name">Name</label>
                                 <input type="text" name="name" id="name" placeholder="Enter Name" required>
                             </div>
+                            
                             <div class="formGroup">
-                                <label for="phone">Phone</label>
-                                <input type="tel" name="phone" id="phone" placeholder="10-digit mobile number" >
+                                    <label for="gender">Gender</label>
+                                    <select name="gender" id="gender" required>
+                                        <option value="">--Select--</option >
+                                        <option value="male">Male</option >
+                                        <option value="female">Female</option >
+                                    </select>
                             </div>
                         </div>
                         <div class="row2">
                             <div class="formGroup">
-                                <label for="email">Email</label>
-                                <input type="email" name="email" id="email" placeholder="xyz@gmail.com" >
+                                <label for="phone">Phone</label>
+                                <input type="tel" name="phone" id="phone" placeholder="10-digit mobile number" required>
                             </div>
                             <div class="formGroup">
-                                    <label for="gender">Gender</label>
-                                    <select name="gender" id="gender" required>
-                                        <option value="select">--Select--</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                    </select>
+                                <label for="email">Email</label>
+                                <input type="email" name="email" id="email" placeholder="xyz@gmail.com" >
                             </div>
                         </div>
                         <div class="row3">
@@ -71,15 +78,24 @@
                             <div class="formGroup">
                                 <label for="bloodGroup">Blood Group</label>
                                 <select name="bloodGroup" id="bloodGroup" required>
-                                    <option value="select">--Select--</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
+                                    <option value="">--Select--</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                        <option value="A1+">A1+</option>
+                                        <option value="A1-">A1-</option>
+                                        <option value="A2+">A2+</option>
+                                        <option value="A2-">A2-</option>
+                                        <option value="A1B+">A1B+</option>
+                                        <option value="A1B-">A1B-</option>
+                                        <option value="A2B+">A2B+</option>
+                                        <option value="A2B-">A2B-</option>
+                                        <option value="BOMBAY">BOMBAY</option>
                                 </select>
                             </div>
                             <div class="formGroup">
