@@ -31,7 +31,7 @@
             <hr style="color:#9A9A9A">
             <div class="formContainer">
                 <form method="POST">
-                    
+                    {% csrf_token %}
                     <div class="formBody">
                         <div class="row1">
                             <div class="formGroup">
@@ -40,17 +40,17 @@
                             </div>
                             <div class="formGroup">
                                 <label for="phone">Phone</label>
-                                <input type="tel" name="phone" id="phone" placeholder="10-digit mobile number" required>
+                                <input type="tel" name="phone" id="phone" placeholder="10-digit mobile number" >
                             </div>
                         </div>
                         <div class="row2">
                             <div class="formGroup">
                                 <label for="email">Email</label>
-                                <input type="email" name="email" id="email" placeholder="xyz@gmail.com" required>
+                                <input type="email" name="email" id="email" placeholder="xyz@gmail.com" >
                             </div>
                             <div class="formGroup">
                                     <label for="gender">Gender</label>
-                                    <select name="gender" id="gender">
+                                    <select name="gender" id="gender" required>
                                         <option value="select">--Select--</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
@@ -60,17 +60,17 @@
                         <div class="row3">
                             <div class="formGroup">
                                 <label for="height">Height (in cm)</label>
-                                <input type="number" name="height" id="height" placeholder="Enter Height" required>
+                                <input type="number" name="height" id="height" placeholder="Enter Height" >
                             </div>
                             <div class="formGroup">
                                 <label for="weight">Weight (in kg)</label>
-                                <input type="number" name="weight" id="weight" placeholder="Enter Weight" required>
+                                <input type="number" name="weight" id="weight" placeholder="Enter Weight" >
                             </div>
                         </div>
                         <div class="row4">
                             <div class="formGroup">
                                 <label for="bloodGroup">Blood Group</label>
-                                <select name="bloodGroup" id="bloodGroup">
+                                <select name="bloodGroup" id="bloodGroup" required>
                                     <option value="select">--Select--</option>
                                     <option value="O+">O+</option>
                                     <option value="O-">O-</option>

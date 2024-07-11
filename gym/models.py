@@ -21,22 +21,23 @@ class Customer(models.Model):
     WEIGHT_TRAINING = 'WT'
     CARDIO = 'C'
     BOTH = 'B'
-    
+
     MEMBERSHIP_CHOICES = [
         (WEIGHT_TRAINING, 'Weight Training'),
         (CARDIO, 'Cardio'),
         (BOTH, 'Both'),
     ]
 
-    name = models.CharField(max_length=255)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
-    height = models.FloatField(help_text='Height in centimeters')
-    weight = models.FloatField(help_text='Weight in kilograms')
-    bmi = models.FloatField(editable=False)
-    membership_type = models.CharField(max_length=2, choices=MEMBERSHIP_CHOICES)
-    admission_number = models.PositiveIntegerField(editable=False, default=0)
     unique_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    phone_no = models.CharField(max_length=10, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    height = models.FloatField(help_text='Height in centimeters', null=True, blank=True)
+    weight = models.FloatField(help_text='Weight in kilograms', null=True, blank=True)
+    blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES)
+    bmi = models.FloatField(editable=False, null=True, blank=True)
+    admission_number = models.PositiveIntegerField(editable=False, default=0)
     date_of_admission = models.DateField(default=timezone.now)
 
     @property
@@ -51,9 +52,9 @@ class Customer(models.Model):
         current_year = timezone.now().year
         current_month = timezone.now().month
         fees_paid = self.feedetail_set.filter(date_of_payment__year=current_year).values_list('month', flat=True)
-        remaining_months = len([month for month in range(current_month, 13) if month in fees_paid])
+        remaining_months = len([month for month in range(current_month, 13) if month not in fees_paid])
         return remaining_months
-    
+
     def save(self, *args, **kwargs):
         if not self.admission_number:
             last_customer = Customer.objects.filter(gender=self.gender).order_by('admission_number').last()
@@ -61,8 +62,8 @@ class Customer(models.Model):
                 self.admission_number = last_customer.admission_number + 1
             else:
                 self.admission_number = 10000
-
-        self.bmi = self.weight / (self.height / 100) ** 2
+        if self.height and self.weight:
+            self.bmi = self.weight / (self.height / 100) ** 2
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -80,7 +81,7 @@ class Customer(models.Model):
 
         month = start_month
         year = timezone.now().year
-        amount_per_month = amount / months
+        amount_per_month = round(amount / months, 2)
 
         for _ in range(months):
             if month > 12:
