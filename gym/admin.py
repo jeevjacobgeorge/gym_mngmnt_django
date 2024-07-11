@@ -12,8 +12,11 @@ class FeeDetailAdmin(admin.ModelAdmin):
     search_fields = ('customer__name', 'date_of_payment')
     list_filter = ('date_of_payment', 'month')
 
+class CategoryTableAdmin(admin.ModelAdmin):
+    list_display = ('name', 'price')
+
 
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(FeeDetail, FeeDetailAdmin)
-admin.site.register(CategoryTable)
+admin.site.register(CategoryTable, CategoryTableAdmin)
 

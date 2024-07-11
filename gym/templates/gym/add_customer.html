@@ -1,14 +1,101 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Add Customer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverYouth Gym - New Customer</title>
+    <link rel="stylesheet" href="{% static 'gym/newCust.css' %}">
 </head>
 <body>
-    <h1>Add Customer</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Add Customer</button>
-    </form>
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <img src="{% static 'gym/assets/images/Logo.png' %}" alt="Logo">
+            </div>
+            <nav>
+                <a href="/dashboard"><li><i class="fa-solid fa-house" style="color: #9a9a9a;"></i><div class="navText">Dashboard</div></li>
+                <a href="custDash.html"><li><i class="fa-solid fa-magnifying-glass" style="color: #9a9a9a;"></i><div class="navText">Search</div></li></a>
+                <a href="" style="color:#f4440e;"><li><i class="fa-solid fa-file" style="color: #f4440e;"></i><div class="navText">New Customer</div></li></a>
+                <a href="feeDetails.html"><li><i class="fa-solid fa-circle-info" style="color: #9a9a9a;"></i><div class="navText">Fee Details</div></li></a>
+            </nav>
+        </div>
+        <div class="content">
+            <div class="header">
+                <h1>New Customer</h1>
+                <div class="userIcon">
+                    <!-- <a href="login.html" onclick="alert('Logged out successfully')"><i class="fa-solid fa-user" style="color: #c7c7c7;"></i></a> -->
+                    <a href="{% url 'logout' %}" ><i class="fa-solid fa-power-off" style="color: #c7c7c7;"></i></a>
+                </div>
+            </div>
+            <hr style="color:#9A9A9A">
+            <div class="formContainer">
+                <form method="POST">
+                    
+                    <div class="formBody">
+                        <div class="row1">
+                            <div class="formGroup">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" id="name" placeholder="Enter Name" required>
+                            </div>
+                            <div class="formGroup">
+                                <label for="phone">Phone</label>
+                                <input type="tel" name="phone" id="phone" placeholder="10-digit mobile number" required>
+                            </div>
+                        </div>
+                        <div class="row2">
+                            <div class="formGroup">
+                                <label for="email">Email</label>
+                                <input type="email" name="email" id="email" placeholder="xyz@gmail.com" required>
+                            </div>
+                            <div class="formGroup">
+                                    <label for="gender">Gender</label>
+                                    <select name="gender" id="gender">
+                                        <option value="select">--Select--</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                    </select>
+                            </div>
+                        </div>
+                        <div class="row3">
+                            <div class="formGroup">
+                                <label for="height">Height (in cm)</label>
+                                <input type="number" name="height" id="height" placeholder="Enter Height" required>
+                            </div>
+                            <div class="formGroup">
+                                <label for="weight">Weight (in kg)</label>
+                                <input type="number" name="weight" id="weight" placeholder="Enter Weight" required>
+                            </div>
+                        </div>
+                        <div class="row4">
+                            <div class="formGroup">
+                                <label for="bloodGroup">Blood Group</label>
+                                <select name="bloodGroup" id="bloodGroup">
+                                    <option value="select">--Select--</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                </select>
+                            </div>
+                            <div class="formGroup">
+                                <label for="doj">Date of Joining</label>
+                                <input type="date" id="doj" name="doj" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="formGroup">
+                        <input type="submit" class="submitForm" value="Create">
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://kit.fontawesome.com/570d6d8240.js" crossorigin="anonymous"></script>
 </body>
 </html>
