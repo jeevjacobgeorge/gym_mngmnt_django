@@ -8,7 +8,14 @@ from django.contrib.auth.forms import AuthenticationForm
 
 @login_required
 def dashboard(request):
-    return render(request, 'gym/dashboard.html')
+    data ={}
+    data['no_of_customers'] = Customer.objects.count()
+    data['no_of_male'] = Customer.objects.filter(gender='male').count()
+    data['no_of_female'] = Customer.objects.filter(gender='female').count()
+    all_customers = Customer.objects.all()
+    active_customers = [customer for customer in all_customers if customer.is_active]
+    data['no_of_active'] = len(active_customers)
+    return render(request, 'gym/dashboard.html',data)
 
 def logout_view(request):
     logout(request)
