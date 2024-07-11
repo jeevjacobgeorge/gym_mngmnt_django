@@ -16,12 +16,12 @@ body{
 /* Navbar start */
 
 .navbar{
-    width:15%;
+    width:18%;
     background-color:#26292E;
     box-shadow: 0 15px 10px rgba(0, 0, 0, 0.35);
     position: relative;
     z-index: 1;
-    padding:20px 0px 10px 30px;
+    padding:20px;
 }
 
 
@@ -43,7 +43,8 @@ body{
 
 .navbar nav a:hover > li{
     font-size:20px;
-    transition: 0.7s;
+    color:#E95D18;
+    transition: 0.3s;
 }
 
 
@@ -61,7 +62,6 @@ body{
 }
 
 /* Navbar ends */
-
 .content{
     width:85%;
     background-color:#212529;

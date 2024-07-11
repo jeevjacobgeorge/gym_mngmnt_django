@@ -14,10 +14,10 @@
                 <img src="{% static 'gym/assets/images/Logo.png' %}" alt="Logo">
             </div>
             <nav>
-                <a href="/dashboard"><li><i class="fa-solid fa-house" style="color: #9a9a9a;"></i><div class="navText">Dashboard</div></li>
-                <a href="custDash.html"><li><i class="fa-solid fa-magnifying-glass" style="color: #9a9a9a;"></i><div class="navText">Search</div></li></a>
-                <a href="" style="color:#f4440e;"><li><i class="fa-solid fa-file" style="color: #f4440e;"></i><div class="navText">New Customer</div></li></a>
-                <a href="feeDetails.html"><li><i class="fa-solid fa-circle-info" style="color: #9a9a9a;"></i><div class="navText">Fee Details</div></li></a>
+                <a href="{% url 'dashboard' %}"><li><i class="fa-solid fa-house" style="color: #9a9a9a;"></i>Dashboard</li>
+                <a href="#"><li><i class="fa-solid fa-magnifying-glass" style="color: #9a9a9a;"></i>Search</li></a>
+                <a href="#"style="color:#f4440e;"><li><i class="fa-solid fa-file" style="color: #f4440e;"></i>New Customer</li></a>
+                <a href="#"><li><i class="fa-solid fa-circle-info" style="color: #9a9a9a;"></i>Fee Details</li></a>
             </nav>
         </div>
         <div class="content">
