@@ -1,15 +1,111 @@
+{%load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Pay Fees</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverYouth Gym - New Customer</title>
+    <link rel="stylesheet" href="{% static  'gym/payFees.css' %}">
 </head>
 <body>
-    <h1>Pay Fees for {{ customer.name }}</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Pay Fees</button>
-    </form>
-    <a href="{% url 'customer_list' %}">Back to Customer List</a>
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <img src="{% static 'gym/assets/images/Logo.png' %}" alt="Logo">
+            </div>
+            <nav>
+                <a href="{% url 'dashboard' %}"><li><i class="fa-solid fa-house" style="color: #9a9a9a;"></i>Dashboard</li></a>
+                <a href="#"><li><i class="fa-solid fa-magnifying-glass" style="color: #9a9a9a;"></i>Search</li></a>
+                <a href="/add"><li><i class="fa-solid fa-file"></i>New Customer</li></a>
+                <a href="{% url 'feeDetails' %}" style="color:#f4440e;"><li><i class="fa-solid fa-circle-info" style="color: #f4440e;"></i>Fee Details</li></a>
+            </nav>
+        </div>
+        <div class="content">
+            <div class="header">
+                <h1>Pay Fees</h1>
+                <div class="userIcon">
+                    <a href="login.html" onclick="alert('Logged out successfully')"><i class="fa-solid fa-power-off" style="color: #c7c7c7;"></i></a>
+                </div>
+            </div>
+            <hr style="color:#9A9A9A">
+            <div class="formContainer">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="formBody">
+                        <div class="row1">
+                            <div class="formGroup">
+                                <label for="name">Name:</label>
+                                <input type="text" name="name" id="name" value="{{customer.name}}" readonly required>
+                            </div>
+                            <div class="formGroup">
+                                <label for="memId">Membership ID</label>
+                                <input type="text" name="memId" id="memId" value="{{customer.admission_number}}" readonly required>
+                            </div>
+                            <!-- <a href="#">Don't know the ID? Find it here!</a>     -->
+                        </div>
+                        <div class="row2">
+                            <div class="formGroup">
+                                <label for="category">Category</label>
+                                <select name="category" id="category">
+                                    <option value="">--Select--</option>
+                                    <option value="Weight Training">Weight Training</option>
+                                    <option value="Cardio">Cardio</option>
+                                    <option value="Both">Both</option>
+                                </select>
+                            </div>
+                            <div class="formGroup">
+                                <label for="gender">Gender</label>
+                                <select name="gender" id="gender">
+                                    <option value="{{customer.gender}}">{{customer.gender}}</option>
+                                    <!-- <option value="male">Male</option>
+                                    <option value="female">Female</option> -->
+                                </select>
+                            </div>
+                            
+                        </div>
+                        <div class="row3">
+                            <div class="formGroup">
+                                <label for="amount">Amount</label>
+                                <input type="number" name="amount" id="amount" placeholder="Enter Amount Paid" required>
+                            </div>
+                            <div class="formGroup">
+                                <label for="duration">Number of Months</label>
+                                <input type="number" name="duration" id="duration" placeholder="Enter value" required>
+                            </div>
+                        </div>
+                        <div class="row4">
+                            <div class="formGroup">
+                                <label for="dop">Date of Payment</label>
+                                <input type="date" name="dop" id="dop" required>
+                            </div>
+                            <div class="formGroup">
+                                <label for="startMonth">Start Month</label>
+                                <select name="startMonth" id="startMonth" required>
+                                    <option value="">--Select--</option>
+                                    <option value="1" {% if last_month_paid == 12 %}selected{% endif %}>January</option>
+                                    <option value="2" {% if last_month_paid == 1 %}selected{% endif %}>February</option>
+                                    <option value="3" {% if last_month_paid == 2 %}selected{% endif %}>March</option>
+                                    <option value="4" {% if last_month_paid == 3 %}selected{% endif %}>April</option>
+                                    <option value="5" {% if last_month_paid == 4 %}selected{% endif %}>May</option>
+                                    <option value="6" {% if last_month_paid == 5 %}selected{% endif %}>June</option>
+                                    <option value="7" {% if last_month_paid == 6 %}selected{% endif %}>July</option>
+                                    <option value="8" {% if last_month_paid == 7 %}selected{% endif %}>August</option>
+                                    <option value="9" {% if last_month_paid == 8 %}selected{% endif %}>September</option>
+                                    <option value="10" {% if last_month_paid == 9 %}selected{% endif %}>October</option>
+                                    <option value="11" {% if last_month_paid == 10 %}selected{% endif %}>November</option>
+                                    <option value="12" {% if last_month_paid == 11 %}selected{% endif %}>December</option>      
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="formGroup">
+                        <input type="submit" class="submitForm" value="Mark as Paid">
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://kit.fontawesome.com/570d6d8240.js" crossorigin="anonymous"></script>
 </body>
 </html>

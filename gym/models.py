@@ -76,34 +76,10 @@ class Customer(models.Model):
             self.bmi = self.weight / (self.height / 100) ** 2
         super().save(*args, **kwargs)
 
+
     def __str__(self):
         return self.name
 
-    def pay_fees(self, amount, months, start_month=None):
-        """
-        Function to pay fees for multiple months.
-        :param amount: Total amount paid
-        :param months: Number of months paid for
-        :param start_month: Optional start month, defaults to the current month
-        """
-        if not start_month:
-            start_month = timezone.now().month
-
-        month = start_month
-        year = timezone.now().year
-        amount_per_month = round(amount / months, 2)
-
-        for _ in range(months):
-            if month > 12:
-                month = 1
-                year += 1
-            FeeDetail.objects.create(
-                customer=self,
-                amount_paid=amount_per_month,
-                date_of_payment=timezone.now(),
-                month=month,
-            )
-            month += 1
 
 class FeeDetail(models.Model):
     MONTH_CHOICES = [

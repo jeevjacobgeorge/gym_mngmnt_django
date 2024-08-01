@@ -7,7 +7,7 @@ class CustomerAdmin(admin.ModelAdmin):
     readonly_fields = ('admission_number', 'bmi', 'months_remaining')
 
 class FeeDetailAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'amount_paid', 'date_of_payment', 'month')
+    list_display = ('customer', 'amount_paid', 'date_of_payment', 'month','year')
     search_fields = ('customer__name', 'date_of_payment')
     list_filter = ('date_of_payment', 'month')
 
