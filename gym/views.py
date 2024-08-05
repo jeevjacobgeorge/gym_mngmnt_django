@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 import datetime
 
+@login_required
 def dashboard(request):
     data ={}
     data['no_of_customers'] = Customer.objects.count()
@@ -22,7 +23,7 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
-
+@login_required
 def add_customer(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -70,6 +71,7 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'gym/login.html', {'form': form})
 
+@login_required
 def fee_details(request):
     customers = Customer.objects.all()
     months = list(range(1, 13))  # Representing months from January to December
