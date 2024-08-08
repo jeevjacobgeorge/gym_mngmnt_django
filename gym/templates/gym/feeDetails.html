@@ -145,7 +145,9 @@
                     let customerRow = document.createElement('tr');
                     customerRow.innerHTML = `
                         <td>${customerDataObj.customer.admission_number}</td>
-                        <td class="name">${customerDataObj.customer.name}</td>
+                        <td class="name">
+                            <a href="/profile/${customerDataObj.customer.id}/">${customerDataObj.customer.name}</a>
+                        </td>
                     `;
                     customerData.appendChild(customerRow);
 

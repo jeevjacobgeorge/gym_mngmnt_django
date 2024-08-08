@@ -169,3 +169,23 @@ def fee_details(request):
     
     # Render the HTML template for non-AJAX requests
     return render(request, 'gym/feeDetails.html', context)
+@login_required
+def profile_view(request, customer_id):
+    customer = get_object_or_404(Customer, pk=customer_id)
+    latest_fee_detail = customer.feedetail_set.order_by('-date_of_payment').first()
+
+    context = {
+        'name': customer.name,
+        'id': customer.unique_id,
+        'gender': customer.get_gender_display(),
+        'email': customer.email,
+        'phone': customer.phone_no,
+        'height': customer.height,
+        'weight': customer.weight,
+        'bmi': customer.bmi,
+        'bloodGroup': customer.get_blood_group_display(),
+        'doj': customer.date_of_admission,
+        'category': latest_fee_detail.get_category_display() if latest_fee_detail else 'N/A',
+        'activeMonth': latest_fee_detail.get_month_display() if latest_fee_detail else 'N/A'
+    }
+    return render(request, 'gym/profile.html', context)
