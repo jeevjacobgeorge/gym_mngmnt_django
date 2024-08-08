@@ -15,7 +15,6 @@
             </div>
             <nav>
                 <a href="{% url 'dashboard' %}"><li><i class="fa-solid fa-house" style="color: #9a9a9a;"></i>Dashboard</li></a>
-                <a href="#"><li><i class="fa-solid fa-magnifying-glass" style="color: #9a9a9a;"></i>Search</li></a>
                 <a href="/add"><li><i class="fa-solid fa-file"></i>New Customer</li></a>
                 <a href="{% url 'feeDetails' %}" ><li><i class="fa-solid fa-circle-info" style="color: #9a9a9a;"></i>Fee Details</li></a>
             </nav>
@@ -36,12 +35,12 @@
                         </div>
                         <div class="user">
                             <h2><b>{{ name }}</b></h2>
-                            <h4>{{ id }} , {{ gender }}</h4>
+                            <h4> Age:{{age}},{{ gender }}</h4>
                         </div>
                     </div>
                     <div class="buttonSection">
-                        <a href="editCust.html"><button class="editButton">Edit Details</button></a>
-                        <a href="payFees.html"><button class="payFeesButton">Pay Fees</button></a>
+                        <a href="/edit/{{id}}"><button class="editButton">Edit Details</button></a>
+                        <a href="/pay_fees/{{id}}"><button class="payFeesButton">Pay Fees</button></a>
                     </div>
                 </div>
                 <div class="rowSection">

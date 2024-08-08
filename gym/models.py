@@ -49,6 +49,7 @@ class Customer(models.Model):
     bmi = models.FloatField(editable=False, null=True, blank=True)
     admission_number = models.PositiveIntegerField(editable=False, default=0)
     date_of_admission = models.DateField(default=timezone.now)
+    date_of_birth = models.DateField(null=True, blank=True)
 
     @property
     def is_active(self):

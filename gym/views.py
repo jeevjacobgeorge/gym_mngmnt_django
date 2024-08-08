@@ -33,7 +33,7 @@ def add_customer(request):
         height = request.POST.get('height', None)  # Default to None if not provided
         weight = request.POST.get('weight', None)  # Default to None if not provided
         blood_group = request.POST.get('bloodGroup')
-        doj = request.POST.get('doj')
+        dob = request.POST.get('dob')
         # Validate and save form data
         try:
             new_customer = Customer(
@@ -44,7 +44,8 @@ def add_customer(request):
                 height=float(height) if height else None,
                 weight=float(weight) if weight else None,
                 blood_group=blood_group,
-                date_of_admission=doj
+                date_of_birth=dob,
+                date_of_admission=timezone.now()
             )
             new_customer.save()
             return render(request,'gym/success.html')  # Replace 'success' with the URL name for success page
@@ -70,6 +71,8 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'gym/login.html', {'form': form})
+
+
 @login_required
 def pay_fees(request, cust_id):
     customer = get_object_or_404(Customer, pk=cust_id)
@@ -169,15 +172,20 @@ def fee_details(request):
     
     # Render the HTML template for non-AJAX requests
     return render(request, 'gym/feeDetails.html', context)
+
 @login_required
 def profile_view(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
     latest_fee_detail = customer.feedetail_set.order_by('-date_of_payment').first()
-
+    if customer.date_of_birth:
+        age = timezone.now().year - customer.date_of_birth.year
+    else:
+        age = None
     context = {
         'name': customer.name,
-        'id': customer.unique_id,
+        'id': customer.pk,
         'gender': customer.get_gender_display(),
+        'age': age,
         'email': customer.email,
         'phone': customer.phone_no,
         'height': customer.height,
@@ -189,3 +197,35 @@ def profile_view(request, customer_id):
         'activeMonth': latest_fee_detail.get_month_display() if latest_fee_detail else 'N/A'
     }
     return render(request, 'gym/profile.html', context)
+@login_required
+def edit_customer(request, customer_id):
+    customer = get_object_or_404(Customer, pk=customer_id)
+
+    if request.method == 'POST':
+        # Get the updated details from the form
+        name = request.POST.get('name')
+        phone = request.POST.get('phone', None)
+        email = request.POST.get('email', None)
+        gender = request.POST.get('gender')
+        height = request.POST.get('height', None)
+        weight = request.POST.get('weight', None)
+        blood_group = request.POST.get('bloodGroup')
+        dob = request.POST.get('dob')
+
+        try:
+            # Update the customer details
+            customer.name = name
+            customer.phone_no = phone
+            customer.email = email
+            customer.gender = gender
+            customer.height = float(height) if height else None
+            customer.weight = float(weight) if weight else None
+            customer.blood_group = blood_group
+            customer.date_of_birth = dob  # Ensure dob is in 'YYYY-MM-DD' format
+            customer.save()
+
+            return redirect('profile', customer_id=customer_id)
+        except ValueError:
+            return render(request, 'gym/edit_customer.html', {'error': 'Invalid input. Please enter valid data.', 'customer': customer})
+
+    return render(request, 'gym/edit_customer.html', {'customer': customer})
