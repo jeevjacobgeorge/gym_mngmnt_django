@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 import datetime
-
+from django.db import models
 @login_required
 def dashboard(request):
     data ={}
@@ -70,37 +70,6 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'gym/login.html', {'form': form})
-
-@login_required
-def fee_details(request):
-    customers = Customer.objects.all()
-    months = list(range(1, 13))  # Representing months from January to December
-    current_year = datetime.datetime.now().year
-    
-    # Create a list to hold the customer fee details
-    customer_fee_details = []
-    for customer in customers:
-        fees_paid = FeeDetail.objects.filter(customer=customer, year=current_year).values_list('month', flat=True)
-        fees_status = {month: month in fees_paid for month in months}
-        customer_fee_details.append({
-            'customer': {
-                'id': customer.pk,
-                'admission_number': customer.admission_number,
-                'name': customer.name,
-            },
-            'fees_status': fees_status
-        })
-
-    context = {
-        'customers': customer_fee_details,
-        'months': months
-    }
-
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse(context)
-    else:
-        return render(request, 'gym/feeDetails.html', context)
-    
 @login_required
 def pay_fees(request, cust_id):
     customer = get_object_or_404(Customer, pk=cust_id)
@@ -140,3 +109,63 @@ def pay_fees(request, cust_id):
         return redirect('feeDetails')
 
     return render(request, 'gym/pay_fees.html', {'customer': customer, 'last_month_paid': last_month_paid})
+
+@login_required
+def fee_details(request):
+    gender = request.GET.get('gender', 'select')
+    year = request.GET.get('year', timezone.now().year)
+    search_query = request.GET.get('search', '').strip()
+
+    # Filter customers by gender
+    customers = Customer.objects.all()
+    if gender != 'select':
+        customers = customers.filter(gender=gender)
+    
+    # Filter customers by search query for name or membership ID
+    if search_query:
+        customers = customers.filter(
+            models.Q(name__icontains=search_query) | 
+            models.Q(admission_number__icontains=search_query)
+        )
+    
+    # Validate year
+    try:
+        year = int(year)
+    except ValueError:
+        year = timezone.now().year
+
+    # Map month numbers to their abbreviations
+    month_abbreviations = {
+        1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr',
+        5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug',
+        9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'
+    }
+    
+    months = [month_abbreviations[i] for i in range(1, 13)]
+
+    # Create a list to hold the customer fee details
+    customer_fee_details = []
+    for customer in customers:
+        fees_paid = FeeDetail.objects.filter(customer=customer, year=year).values_list('month', flat=True)
+        fees_status = {month_abbreviations[month]: month in fees_paid for month in range(1, 13)}
+        customer_fee_details.append({
+            'customer': {
+                'id': customer.pk,
+                'admission_number': customer.admission_number,
+                'name': customer.name,
+            },
+            'fees_status': fees_status
+        })
+
+    context = {
+        'customers': customer_fee_details,
+        'months': months,
+        'year': year,
+    }
+
+    # Return JSON response for AJAX requests
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse(context)
+    
+    # Render the HTML template for non-AJAX requests
+    return render(request, 'gym/feeDetails.html', context)

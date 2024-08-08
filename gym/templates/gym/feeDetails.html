@@ -38,6 +38,10 @@
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                             </select>
+                            <select name="year" id="year">
+                                <option value="">--Year--</option>
+                                <!-- Year options will be populated by JavaScript -->
+                            </select>
                             <select name="activity" id="activity">
                                 <option value="select">--Activity--</option>
                                 <option value="active">Active</option>
@@ -45,6 +49,7 @@
                             </select>
                         </div>
                     </form>
+                    
                     <a href=""><button class="addAlumniButton">Pay Fees</button></a> 
                 </div>
                 <div class="table-container">
@@ -89,51 +94,103 @@
     </div>
     <script src="https://kit.fontawesome.com/570d6d8240.js" crossorigin="anonymous"></script>
     <script>
-     document.addEventListener('DOMContentLoaded', function() {
-    fetch("{% url 'feeDetails' %}", {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+    document.addEventListener('DOMContentLoaded', function() {
+        // Populate year dropdown
+        const currentYear = new Date().getFullYear();
+        const startYear = 2020;
+        const yearSelect = document.getElementById('year');
+
+        for (let year = startYear; year <= currentYear; year++) {
+            let option = document.createElement('option');
+            option.value = year;
+            option.text = year;
+            yearSelect.appendChild(option);
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        const customerData = document.getElementById('customer-data');
-        const feeStatus = document.getElementById('fee-status');
-        const actionButtons = document.getElementById('action-buttons');
 
-        data.customers.forEach(customerDataObj => {
-            // Append customer data
-            let customerRow = document.createElement('tr');
-            customerRow.innerHTML = `
-                <td>${customerDataObj.customer.admission_number}</td>
-                <td class="name">${customerDataObj.customer.name}</td>
-            `;
-            customerData.appendChild(customerRow);
+        // Function to fetch and display data
+        function fetchAndDisplayData() {
+            const gender = document.getElementById('gender').value;
+            const year = yearSelect.value;
+            const activity = document.getElementById('activity').value;
+            const searchQuery = document.getElementById('customerSearch').value.trim();
+            const url = new URL("{% url 'feeDetails' %}", window.location.origin);
 
-            // Append fee status data
-            let feeRow = document.createElement('tr');
-            data.months.forEach(month => {
-                let statusCell = document.createElement('td');
-                if (customerDataObj.fees_status[month]) {
-                    statusCell.style.backgroundColor = 'green';
-                    statusCell.innerHTML = '<i class="fa-solid fa-check" style="color: white;"></i>';
-                } else {
-                    statusCell.style.backgroundColor = 'red';
-                    statusCell.innerHTML = '<i class="fa-solid fa-times" style="color: white;"></i>';
+            if (gender !== 'select') {
+                url.searchParams.set('gender', gender);
+            }
+            if (year) {
+                url.searchParams.set('year', year);
+            }
+            if (activity !== 'select') {
+                url.searchParams.set('activity', activity);
+            }
+            if (searchQuery) {
+                url.searchParams.set('search', searchQuery);
+            }
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
-                feeRow.appendChild(statusCell);
-            });
-            feeStatus.appendChild(feeRow);
+            })
+            .then(response => response.json())
+            .then(data => {
+                const customerData = document.getElementById('customer-data');
+                const feeStatus = document.getElementById('fee-status');
+                const actionButtons = document.getElementById('action-buttons');
 
-            // Append action buttons
-            let actionRow = document.createElement('tr');
-            actionRow.innerHTML = `<td><a href="/pay_fees/${customerDataObj.customer.id}">Pay Fees</a></td>`;
-            actionButtons.appendChild(actionRow);
+                customerData.innerHTML = '';
+                feeStatus.innerHTML = '';
+                actionButtons.innerHTML = '';
+
+                data.customers.forEach(customerDataObj => {
+                    // Append customer data
+                    let customerRow = document.createElement('tr');
+                    customerRow.innerHTML = `
+                        <td>${customerDataObj.customer.admission_number}</td>
+                        <td class="name">${customerDataObj.customer.name}</td>
+                    `;
+                    customerData.appendChild(customerRow);
+
+                    // Append fee status data
+                    let feeRow = document.createElement('tr');
+                    data.months.forEach(month => {
+                        let statusCell = document.createElement('td');
+                        if (customerDataObj.fees_status[month]) {
+                            statusCell.style.backgroundColor = 'green';
+                            statusCell.innerHTML = '<i class="fa-solid fa-check" style="color: white;"></i>';
+                        } else {
+                            statusCell.style.backgroundColor = 'red';
+                            statusCell.innerHTML = '<i class="fa-solid fa-times" style="color: white;"></i>';
+                        }
+                        feeRow.appendChild(statusCell);
+                    });
+                    feeStatus.appendChild(feeRow);
+
+                    // Append action buttons
+                    let actionRow = document.createElement('tr');
+                    actionRow.innerHTML = `<td><a href="/pay_fees/${customerDataObj.customer.id}">Pay Fees</a></td>`;
+                    actionButtons.appendChild(actionRow);
+                });
+            })
+            .catch(error => console.error('Error fetching fee details:', error));
+        }
+
+        // Fetch data initially
+        fetchAndDisplayData();
+
+        // Handle filter and search changes
+        const searchForm = document.getElementById('searchForm');
+        searchForm.addEventListener('change', function() {
+            fetchAndDisplayData();
         });
-    })
-    .catch(error => console.error('Error fetching fee details:', error));
-});
 
+        // Handle real-time search input
+        const searchInput = document.getElementById('customerSearch');
+        searchInput.addEventListener('input', function() {
+            fetchAndDisplayData();
+        });
+    });
     </script>
 </body>
 </html>
