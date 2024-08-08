@@ -42,15 +42,15 @@
                                 <option value="">--Year--</option>
                                 <!-- Year options will be populated by JavaScript -->
                             </select>
-                            <select name="activity" id="activity">
+                            <!-- <select name="activity" id="activity">
                                 <option value="select">--Activity--</option>
                                 <option value="active">Active</option>
                                 <option value="non-active">Non-Active</option>
-                            </select>
+                            </select> -->
                         </div>
-                    </form>
+                    </form> 
                     
-                    <a href=""><button class="addAlumniButton">Pay Fees</button></a> 
+                    <!-- <a href=""><button class="addAlumniButton">Pay Fees</button></a>  -->
                 </div>
                 <div class="table-container">
                     <table class="fixed-column">
@@ -111,7 +111,6 @@
         function fetchAndDisplayData() {
             const gender = document.getElementById('gender').value;
             const year = yearSelect.value;
-            const activity = document.getElementById('activity').value;
             const searchQuery = document.getElementById('customerSearch').value.trim();
             const url = new URL("{% url 'feeDetails' %}", window.location.origin);
 
@@ -121,9 +120,7 @@
             if (year) {
                 url.searchParams.set('year', year);
             }
-            if (activity !== 'select') {
-                url.searchParams.set('activity', activity);
-            }
+ 
             if (searchQuery) {
                 url.searchParams.set('search', searchQuery);
             }

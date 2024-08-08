@@ -97,12 +97,13 @@ body{
 .headerButtons{
     display:flex;
     justify-content: space-between;
+    height: 50px;
 }
 
 .filters{
     display:flex;
     justify-content: space-between;
-    gap:30px;
+    gap:50px;
 }
 
 .filters input{
@@ -194,7 +195,7 @@ body{
     border-collapse:collapse;
 }
 .name{
-    width:300px;
+    width:220px;
 }
 .scrollable-columns {
     display: flex;
@@ -211,7 +212,7 @@ body{
 
 
 .last-column {
-    width: 150px;
+    
     border-left: 1px solid #ddd;
     margin-left:0;
 }
@@ -221,9 +222,10 @@ table {
 }
 th, td {
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 8px;
     text-align: center;
 }
+
 th {
     background-color: #f2f2f2;
 }
