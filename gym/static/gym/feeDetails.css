@@ -12,16 +12,15 @@ body{
     height:100%;
     min-height: 100vh;
 }
-
 /* Navbar start */
 
 .navbar{
-    width:15%;
+    width:18%;
     background-color:#26292E;
     box-shadow: 0 15px 10px rgba(0, 0, 0, 0.35);
     position: relative;
     z-index: 1;
-    padding:20px 0px 10px 30px;
+    padding:20px;
 }
 
 
@@ -43,7 +42,8 @@ body{
 
 .navbar nav a:hover > li{
     font-size:20px;
-    transition: 0.7s;
+    color:#E95D18;
+    transition: 0.3s;
 }
 
 
@@ -56,11 +56,11 @@ body{
 }
 
 .logo img{
-    width:150px;
-    margin-left:18px;
+    width:180px;
     height:auto;
 }
 
+/* Navbar ends */
 /* Navbar ends */
 
 .content{
@@ -196,12 +196,12 @@ body{
     border-collapse:collapse;
 }
 .name{
-    width:220px;
+    width:150px;
 }
 
 .name a{
-    color:white;
-    text-decoration: none;
+    color:skyblue;
+    
 }
 
 .name a:hover{
@@ -217,22 +217,22 @@ body{
 }
 
 .scrollable-columns td{
-    background-color:grey;
+    background-color:#212529;
+    color: white;
 }
+
 .scrollable-columns th,td{
     width:40px;
 }
 
-
 .last-column {
-    
     border-left: 1px solid #ddd;
     margin-left:0;
 }
 
 #action-buttons a{
-    color:#E95D18;
-    text-decoration: none;
+    color: lightblue;
+    /* text-decoration: none; */
 }
 
 #action-buttons a:hover{

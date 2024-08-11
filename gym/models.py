@@ -50,7 +50,8 @@ class Customer(models.Model):
     admission_number = models.PositiveIntegerField(editable=False, default=0)
     date_of_admission = models.DateField(default=timezone.now)
     date_of_birth = models.DateField(null=True, blank=True)
-
+    class Meta:
+        unique_together = ('name', 'phone_no')
     @property
     def is_active(self):
         current_year = timezone.now().year
@@ -69,6 +70,7 @@ class Customer(models.Model):
     def save(self, *args, **kwargs):
         if not self.admission_number:
             last_customer = Customer.objects.filter(gender=self.gender).order_by('admission_number').last()
+            print(last_customer)
             if last_customer:
                 self.admission_number = last_customer.admission_number + 1
             else:

@@ -33,12 +33,11 @@
                         <div class="filters">
                             <input type="text" placeholder="Search" id="customerSearch" class="customerSearch">
                             <select name="gender" id="gender">
-                                <option value="select">--Gender--</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
+                                <option value="select">Both</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
                             </select>
                             <select name="year" id="year">
-                                <option value="">--Year--</option>
                                 <!-- Year options will be populated by JavaScript -->
                             </select>
                             <!-- <select name="activity" id="activity">
@@ -96,10 +95,10 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Populate year dropdown
         const currentYear = new Date().getFullYear();
-        const startYear = 2020;
+        const startYear = 2023;
         const yearSelect = document.getElementById('year');
 
-        for (let year = startYear; year <= currentYear; year++) {
+        for (let year = currentYear; year >= startYear; year--) {
             let option = document.createElement('option');
             option.value = year;
             option.text = year;
@@ -150,20 +149,31 @@
                     `;
                     customerData.appendChild(customerRow);
 
-                    // Append fee status data
-                    let feeRow = document.createElement('tr');
-                    data.months.forEach(month => {
-                        let statusCell = document.createElement('td');
-                        if (customerDataObj.fees_status[month]) {
-                            statusCell.style.backgroundColor = 'green';
-                            statusCell.innerHTML = '<i class="fa-solid fa-check" style="color: white;"></i>';
-                        } else {
-                            statusCell.style.backgroundColor = 'red';
-                            statusCell.innerHTML = '<i class="fa-solid fa-times" style="color: white;"></i>';
-                        }
-                        feeRow.appendChild(statusCell);
-                    });
-                    feeStatus.appendChild(feeRow);
+                 // Append fee status data
+                let feeRow = document.createElement('tr');
+                data.months.forEach(month => {
+                    let statusCell = document.createElement('td');
+                    let status = customerDataObj.fees_status[month];
+                    if (status=='Weight Training') {
+                        statusCell.style.backgroundColor = 'green';
+                        statusCell.innerHTML = 'Weight';  // Display the category
+                    }
+                    else if (status=='Cardio') {
+                        statusCell.style.backgroundColor = '#6F9CEB';
+                        statusCell.innerHTML = 'Cardio';  // Display the category
+                    }
+                    else if (status=='Both') {
+                        statusCell.style.backgroundColor = '#9A7197';
+                        statusCell.innerHTML = 'Both';  // Display the category
+                    } 
+                    else {
+                        statusCell.style.backgroundColor = '#212529';
+                        statusCell.innerHTML = '❌';  // Display "Not Paid"
+                    }
+                    feeRow.appendChild(statusCell);
+                });
+                feeStatus.appendChild(feeRow);
+
 
                     // Append action buttons
                     let actionRow = document.createElement('tr');

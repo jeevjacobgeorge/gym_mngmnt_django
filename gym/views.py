@@ -48,7 +48,7 @@ def add_customer(request):
                 date_of_admission=timezone.now()
             )
             new_customer.save()
-            return render(request,'gym/success.html')  # Replace 'success' with the URL name for success page
+            return redirect('profile', customer_id=new_customer.pk)
         except ValueError:
            return render(request,'gym/add_customer.html', {'error': 'Invalid input. Please enter valid data.'})
 
@@ -83,7 +83,7 @@ def pay_fees(request, cust_id):
         last_month_paid = last_payment.month
         last_year_paid = last_payment.year
     else:
-        last_month_paid = datetime.datetime.now().month
+        last_month_paid = datetime.datetime.now().month-1   
         last_year_paid = datetime.datetime.now().year
 
     if request.method == 'POST':
@@ -112,7 +112,6 @@ def pay_fees(request, cust_id):
         return redirect('feeDetails')
 
     return render(request, 'gym/pay_fees.html', {'customer': customer, 'last_month_paid': last_month_paid})
-
 @login_required
 def fee_details(request):
     gender = request.GET.get('gender', 'select')
@@ -121,16 +120,16 @@ def fee_details(request):
 
     # Filter customers by gender
     customers = Customer.objects.all()
-    if gender != 'select':
+    if (gender != 'select'):
         customers = customers.filter(gender=gender)
-    
+
     # Filter customers by search query for name or membership ID
     if search_query:
         customers = customers.filter(
             models.Q(name__icontains=search_query) | 
             models.Q(admission_number__icontains=search_query)
         )
-    
+
     # Validate year
     try:
         year = int(year)
@@ -149,8 +148,22 @@ def fee_details(request):
     # Create a list to hold the customer fee details
     customer_fee_details = []
     for customer in customers:
-        fees_paid = FeeDetail.objects.filter(customer=customer, year=year).values_list('month', flat=True)
-        fees_status = {month_abbreviations[month]: month in fees_paid for month in range(1, 13)}
+        # Fetch the FeeDetail objects for the customer and year
+        fee_details = FeeDetail.objects.filter(customer=customer, year=year)
+        
+        # Initialize a dictionary to hold the status for each month
+        fees_status = {}
+        
+        for month in range(1, 13):
+            # Get the fee detail for the specific month
+            fee_detail = fee_details.filter(month=month).first()
+            if fee_detail:
+                # If fee is paid for the month, store the category
+                fees_status[month_abbreviations[month]] = fee_detail.get_category_display()
+            else:
+                # If no fee is paid, store 'Not Paid'
+                fees_status[month_abbreviations[month]] = False
+        
         customer_fee_details.append({
             'customer': {
                 'id': customer.pk,
