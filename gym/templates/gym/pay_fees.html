@@ -1,10 +1,10 @@
-{%load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EverYouth Gym - New Customer</title>
+    <title>EverYouth Gym - Pay Fees</title>
     <link rel="stylesheet" href="{% static  'gym/payFees.css' %}">
 </head>
 <body>
@@ -40,42 +40,28 @@
                                 <label for="memId">Membership ID</label>
                                 <input type="text" name="memId" id="memId" value="{{customer.admission_number}}" readonly required>
                             </div>
-                            <!-- <a href="#">Don't know the ID? Find it here!</a>     -->
                         </div>
                         <div class="row2">
                             <div class="formGroup">
                                 <label for="category">Category</label>
                                 <select name="category" id="category" required>
                                     <option value="">--Select--</option>
-                                    <option value="Weight Training">Weight Training</option>
-                                    <option value="Cardio">Cardio</option>
-                                    <option value="Both">Both</option>
+                                    {% for fee_type in customer.Fees_Type %}
+                                        <option value="{{ fee_type.0 }}">{{ fee_type.1 }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="formGroup">
                                 <label for="gender">Gender</label>
-                                <select name="gender" id="gender">
+                                <select name="gender" id="gender" readonly>
                                     <option value="{{customer.gender}}">{% if customer.gender == 'M' %}Male{% else %}Female{% endif %}</option>
-                                    <!-- <option value="male">Male</option>
-                                    <option value="female">Female</option> -->
                                 </select>
                             </div>
-                            
                         </div>
                         <div class="row3">
                             <div class="formGroup">
                                 <label for="amount">Amount</label>
                                 <input type="number" name="amount" id="amount" placeholder="Enter Amount Paid" required>
-                            </div>
-                            <div class="formGroup">
-                                <label for="duration">Number of Months</label>
-                                <input type="number" name="duration" id="duration" required>
-                                <!-- <select id="duration" style="margin-right: 10px;" type="number" name="duration" required>
-                                    <option value="" disabled selected>Select months</option>
-                                    <option value="1">1 month</option>
-                                    <option value="2">2 months</option>
-                                    <option value="3">3 months</option>
-                                </select> -->
                             </div>
                         </div>
                         <div class="row4">
@@ -84,21 +70,21 @@
                                 <input type="date" name="dop" id="dop" required>
                             </div>
                             <div class="formGroup">
-                                <label for="startMonth">Start Month</label>
-                                <select name="startMonth" id="startMonth" required>
+                                <label for="month">Select Month</label>
+                                <select name="month" id="month" required>
                                     <option value="">--Select--</option>
-                                    <option value="1" {% if last_month_paid == 12 %}selected{% endif %}>January</option>
-                                    <option value="2" {% if last_month_paid == 1 %}selected{% endif %}>February</option>
-                                    <option value="3" {% if last_month_paid == 2 %}selected{% endif %}>March</option>
-                                    <option value="4" {% if last_month_paid == 3 %}selected{% endif %}>April</option>
-                                    <option value="5" {% if last_month_paid == 4 %}selected{% endif %}>May</option>
-                                    <option value="6" {% if last_month_paid == 5 %}selected{% endif %}>June</option>
-                                    <option value="7" {% if last_month_paid == 6 %}selected{% endif %}>July</option>
-                                    <option value="8" {% if last_month_paid == 7 %}selected{% endif %}>August</option>
-                                    <option value="9" {% if last_month_paid == 8 %}selected{% endif %}>September</option>
-                                    <option value="10" {% if last_month_paid == 9 %}selected{% endif %}>October</option>
-                                    <option value="11" {% if last_month_paid == 10 %}selected{% endif %}>November</option>
-                                    <option value="12" {% if last_month_paid == 11 %}selected{% endif %}>December</option>      
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March">March</option>
+                                    <option value="April">April</option>
+                                    <option value="May">May</option>
+                                    <option value="June">June</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September">September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
                                 </select>
                             </div>
                         </div>
@@ -108,18 +94,18 @@
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
     <script>
-        // console.log("{{last_month_paid}}");
         document.addEventListener('DOMContentLoaded', function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('dop').value = today;
-    });
+            const today = new Date();
+            document.getElementById('dop').value = today.toISOString().split('T')[0];
+
+            // Automatically select the current month in the month dropdown
+            const currentMonth = today.toLocaleString('default', { month: 'long' });
+            document.querySelector(`#month option[value="${currentMonth}"]`).selected = true;
+        });
     </script>
-    <script src="https://kit.fontawesome.com/570d6d8240.js" crossorigin="anonymous">
-        
-    </script>
+    <script src="https://kit.fontawesome.com/570d6d8240.js" crossorigin="anonymous"></script>
 </body>
 </html>

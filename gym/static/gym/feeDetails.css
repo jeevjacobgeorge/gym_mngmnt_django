@@ -66,6 +66,7 @@ body{
 .content{
     width:85%;
     background-color:#212529;
+    padding-left:20px;
 }
 
 .header{
@@ -196,7 +197,7 @@ body{
     border-collapse:collapse;
 }
 .name{
-    width:150px;
+    width:300px;
 }
 
 .name a{
@@ -222,12 +223,12 @@ body{
 }
 
 .scrollable-columns th,td{
-    width:40px;
+    width:85px;
 }
 
 .last-column {
     border-left: 1px solid #ddd;
-    margin-left:0;
+    margin-left:5px;
 }
 
 #action-buttons a{
@@ -244,10 +245,12 @@ body{
 table {
     border-collapse: collapse;
     table-layout: fixed;
+    overflow: hidden;
+    
 }
 th, td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 5px 10px;
     text-align: center;
 }
 

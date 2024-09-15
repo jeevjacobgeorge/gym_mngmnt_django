@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 import datetime
+from datetime import datetime
 from django.db import models
 @login_required
 def dashboard(request):
@@ -26,6 +27,7 @@ def logout_view(request):
 @login_required
 def add_customer(request):
     if request.method == 'POST':
+        admission_number = request.POST.get('admission_number')
         name = request.POST.get('name')
         phone = request.POST.get('phone', None)  # Default to None if not provided
         email = request.POST.get('email', None)  # Default to None if not provided
@@ -37,6 +39,7 @@ def add_customer(request):
         # Validate and save form data
         try:
             new_customer = Customer(
+                admission_number=admission_number,
                 name=name,
                 phone_no=phone,
                 email=email,
@@ -72,46 +75,6 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'gym/login.html', {'form': form})
 
-
-@login_required
-def pay_fees(request, cust_id):
-    customer = get_object_or_404(Customer, pk=cust_id)
-    
-    # Get the last month the customer paid fees
-    last_payment = FeeDetail.objects.filter(customer=customer).order_by('-year', '-month').first()
-    if last_payment:
-        last_month_paid = last_payment.month
-        last_year_paid = last_payment.year
-    else:
-        last_month_paid = datetime.datetime.now().month-1   
-        last_year_paid = datetime.datetime.now().year
-
-    if request.method == 'POST':
-        amount = request.POST.get('amount')
-        no_of_months = int(request.POST.get('duration'))
-        startMonth = int(request.POST.get('startMonth'))
-        category = request.POST.get('category')
-        if not startMonth:
-            startMonth = last_month_paid + 1
-        month = startMonth 
-        year = last_year_paid
-        amount_per_month = round(float(amount) / float(no_of_months), 2)
-        for i in range(no_of_months):
-            FeeDetail.objects.create(
-                customer=customer,
-                amount_paid=amount_per_month,
-                month=month,
-                year=year,
-                category=category
-            )
-            month += 1
-            if month > 12:
-                month = 1
-                year += 1
-        
-        return redirect('feeDetails')
-
-    return render(request, 'gym/pay_fees.html', {'customer': customer, 'last_month_paid': last_month_paid})
 @login_required
 def fee_details(request):
     gender = request.GET.get('gender', 'select')
@@ -136,14 +99,26 @@ def fee_details(request):
     except ValueError:
         year = timezone.now().year
 
+    # Get the current month
+    current_month = datetime.now().month
+
+    # List the last 2 months and the next month
+    months_to_show = [
+        (current_month - 2) % 12 or 12, 
+        (current_month - 1) % 12 or 12, 
+        current_month, 
+        (current_month + 1) % 12 or 12
+    ]
+
     # Map month numbers to their abbreviations
     month_abbreviations = {
         1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr',
         5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug',
         9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'
     }
-    
-    months = [month_abbreviations[i] for i in range(1, 13)]
+
+    # Use only the last 2 months and next month
+    months = [month_abbreviations[month] for month in months_to_show]
 
     # Create a list to hold the customer fee details
     customer_fee_details = []
@@ -151,10 +126,10 @@ def fee_details(request):
         # Fetch the FeeDetail objects for the customer and year
         fee_details = FeeDetail.objects.filter(customer=customer, year=year)
         
-        # Initialize a dictionary to hold the status for each month
+        # Initialize a dictionary to hold the status for each displayed month
         fees_status = {}
         
-        for month in range(1, 13):
+        for month in months_to_show:
             # Get the fee detail for the specific month
             fee_detail = fee_details.filter(month=month).first()
             if fee_detail:
@@ -185,7 +160,6 @@ def fee_details(request):
     
     # Render the HTML template for non-AJAX requests
     return render(request, 'gym/feeDetails.html', context)
-
 @login_required
 def profile_view(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
@@ -242,3 +216,49 @@ def edit_customer(request, customer_id):
             return render(request, 'gym/edit_customer.html', {'error': 'Invalid input. Please enter valid data.', 'customer': customer})
 
     return render(request, 'gym/edit_customer.html', {'customer': customer})
+
+def pay_fees(request, customer_id):
+    customer = get_object_or_404(Customer, pk=customer_id)
+
+    if request.method == 'POST':
+        category = request.POST.get('category')
+        amount = request.POST.get('amount')
+        month = request.POST.get('month')
+        dop = request.POST.get('dop')
+        
+        # Parse the form inputs to the appropriate types
+        amount = float(amount)
+        
+        # Map month names to numbers
+        month_mapping = {
+            "January": 1, "February": 2, "March": 3, "April": 4, 
+            "May": 5, "June": 6, "July": 7, "August": 8, 
+            "September": 9, "October": 10, "November": 11, "December": 12
+        }
+
+        # Convert month name to an integer
+        month = month_mapping.get(month)
+        if month is None:
+            raise ValueError("Invalid month selected")
+
+        date_of_payment = dop if dop else timezone.now()
+
+        # Create FeeDetail entry
+        fee_detail = FeeDetail(
+            customer=customer,
+            amount_paid=amount,
+            date_of_payment=date_of_payment,
+            category=category,
+            month=month,
+            year=timezone.now().year
+        )
+        fee_detail.save()
+
+        # Redirect back to the fee details page after saving
+        return redirect('feeDetails')
+
+    # If the request is GET, show the form
+    context = {
+        'customer': customer,
+    }
+    return render(request, 'gym/pay_fees.html', context)

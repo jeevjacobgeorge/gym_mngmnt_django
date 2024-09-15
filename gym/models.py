@@ -28,14 +28,14 @@ class Customer(models.Model):
     ]
 
 
-    WEIGHT_TRAINING = 'WT'
-    CARDIO = 'C'
-    BOTH = 'B'
+    Fees = 'F'
+    Admission = 'A'
+    Other = 'O'
 
-    MEMBERSHIP_CHOICES = [
-        (WEIGHT_TRAINING, 'Weight Training'),
-        (CARDIO, 'Cardio'),
-        (BOTH, 'Both'),
+    Fees_Type = [
+        (Fees, 'Fees'),
+        (Admission, 'Admission'),
+        (Other, 'Other'),
     ]
 
     unique_id = models.AutoField(primary_key=True)
@@ -65,7 +65,7 @@ class Customer(models.Model):
         current_month = timezone.now().month
         fees_paid = self.feedetail_set.filter(date_of_payment__year=current_year).values_list('month', flat=True)
         remaining_months = len([month for month in range(current_month, 13) if month not in fees_paid])
-        return remaining_months
+        return remaining_months 
 
     def save(self, *args, **kwargs):
         if not self.admission_number:
@@ -103,7 +103,7 @@ class FeeDetail(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     date_of_payment = models.DateField(default=timezone.now)
-    category = models.CharField(choices=Customer.MEMBERSHIP_CHOICES, max_length=2, default=Customer.WEIGHT_TRAINING)
+    category = models.CharField(choices=Customer.Fees_Type, max_length=2, default=Customer.Fees)
     month = models.PositiveSmallIntegerField(choices=MONTH_CHOICES, default=timezone.now().month)
     year = models.IntegerField(default=timezone.now().year)
 
@@ -111,7 +111,7 @@ class FeeDetail(models.Model):
         return f"{self.customer.name} - {self.get_month_display()} - {self.amount_paid}"
 
 class CategoryTable(models.Model):
-    name = models.CharField(choices=Customer.MEMBERSHIP_CHOICES, max_length=2, default=Customer.WEIGHT_TRAINING)
+    name = models.CharField(choices=Customer.Fees_Type, max_length=2, default=Customer.Fees)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
