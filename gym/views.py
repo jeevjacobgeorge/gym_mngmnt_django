@@ -216,7 +216,7 @@ def edit_customer(request, customer_id):
             return render(request, 'gym/edit_customer.html', {'error': 'Invalid input. Please enter valid data.', 'customer': customer})
 
     return render(request, 'gym/edit_customer.html', {'customer': customer})
-
+@login_required
 def pay_fees(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
 

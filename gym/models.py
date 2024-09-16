@@ -76,7 +76,7 @@ class Customer(models.Model):
             else:
                 self.admission_number = 10000
         if self.height and self.weight:
-            self.bmi = self.weight / (self.height / 100) ** 2
+            self.bmi = round(self.weight / (self.height / 100) ** 2, 2)
         super().save(*args, **kwargs)
 
 
