@@ -13,8 +13,8 @@ from django.db import models
 def dashboard(request):
     data ={}
     data['no_of_customers'] = Customer.objects.count()
-    data['no_of_male'] = Customer.objects.filter(gender='male').count()
-    data['no_of_female'] = Customer.objects.filter(gender='female').count()
+    data['no_of_male'] = Customer.objects.filter(gender='M').count()
+    data['no_of_female'] = Customer.objects.filter(gender='F').count()
     all_customers = Customer.objects.all()
     active_customers = [customer for customer in all_customers if customer.is_active]
     data['no_of_active'] = len(active_customers)
@@ -83,13 +83,13 @@ def fee_details(request):
 
     # Filter customers by gender
     customers = Customer.objects.all()
-    if (gender != 'select'):
+    if gender != 'select':
         customers = customers.filter(gender=gender)
 
     # Filter customers by search query for name or membership ID
     if search_query:
         customers = customers.filter(
-            models.Q(name__icontains=search_query) | 
+            models.Q(name__icontains=search_query) |
             models.Q(admission_number__icontains=search_query)
         )
 
@@ -99,16 +99,16 @@ def fee_details(request):
     except ValueError:
         year = timezone.now().year
 
-    # Get the current month
-    current_month = datetime.now().month
+    # Get the current month and handle months across the year boundary
+    current_month = datetime.now().month + 3
+    months_to_show = [(current_month - i) % 12 or 12 for i in range(2, -1, -1)]
 
-    # List the last 2 months and the next month
-    months_to_show = [
-        (current_month - 2) % 12 or 12, 
-        (current_month - 1) % 12 or 12, 
-        current_month, 
-        (current_month + 1) % 12 or 12
-    ]
+    # Get the corresponding years for those months
+    months_and_years = []
+    for i, month in enumerate(months_to_show):
+        # If the month is ahead of the current month, it means it belongs to the previous year
+        year_for_month = year - 1 if month > current_month else year
+        months_and_years.append((month, year_for_month))
 
     # Map month numbers to their abbreviations
     month_abbreviations = {
@@ -117,39 +117,43 @@ def fee_details(request):
         9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'
     }
 
-    # Use only the last 2 months and next month
-    months = [month_abbreviations[month] for month in months_to_show]
+    months = [month_abbreviations[month] for month, _ in months_and_years]
 
-    # Create a list to hold the customer fee details
-    customer_fee_details = []
+    # Create a list to hold the customer fee details, only for those who paid in the last 4 months
+    active_customers = []
     for customer in customers:
-        # Fetch the FeeDetail objects for the customer and year
-        fee_details = FeeDetail.objects.filter(customer=customer, year=year)
-        
-        # Initialize a dictionary to hold the status for each displayed month
+        # Initialize a dictionary to store fee status for each displayed month
         fees_status = {}
-        
-        for month in months_to_show:
-            # Get the fee detail for the specific month
-            fee_detail = fee_details.filter(month=month).first()
+        paid_count = 0
+
+        for month, month_year in months_and_years:
+            # Fetch the FeeDetail object for the specific month and year
+            fee_detail = FeeDetail.objects.filter(customer=customer, year=month_year, month=month).first()
             if fee_detail:
-                # If fee is paid for the month, store the category
+                # If fee is paid, store the category and increment paid_count
                 fees_status[month_abbreviations[month]] = fee_detail.get_category_display()
+                paid_count += 1
             else:
                 # If no fee is paid, store 'Not Paid'
-                fees_status[month_abbreviations[month]] = False
-        
-        customer_fee_details.append({
-            'customer': {
-                'id': customer.pk,
-                'admission_number': customer.admission_number,
-                'name': customer.name,
-            },
-            'fees_status': fees_status
-        })
+                fees_status[month_abbreviations[month]] = 'Not Paid'
+
+        # Only include customers who have paid for at least one month in the last 4 months
+        if paid_count > 0:
+            active_customers.append({
+                'customer': {
+                    'id': customer.pk,
+                    'admission_number': customer.admission_number,
+                    'name': customer.name,
+                },
+                'fees_status': fees_status,
+                'paid_count': paid_count  # Track how many months they paid
+            })
+
+    # Sort customers by activity (paid_count in descending order)
+    active_customers.sort(key=lambda x: x['paid_count'], reverse=True)
 
     context = {
-        'customers': customer_fee_details,
+        'customers': active_customers,
         'months': months,
         'year': year,
     }
@@ -157,9 +161,11 @@ def fee_details(request):
     # Return JSON response for AJAX requests
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse(context)
-    
+
     # Render the HTML template for non-AJAX requests
     return render(request, 'gym/feeDetails.html', context)
+
+
 @login_required
 def profile_view(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
@@ -219,11 +225,16 @@ def edit_customer(request, customer_id):
 @login_required
 def pay_fees(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
+    
+    # Prepare the list of years (current year and previous few years)
+    current_year = timezone.now().year
+    years = list(range(current_year, current_year - 5, -1))  # e.g., last 5 years
 
     if request.method == 'POST':
         category = request.POST.get('category')
         amount = request.POST.get('amount')
         month = request.POST.get('month')
+        year = request.POST.get('year')  # Get the year from the form
         dop = request.POST.get('dop')
         
         # Parse the form inputs to the appropriate types
@@ -241,16 +252,17 @@ def pay_fees(request, customer_id):
         if month is None:
             raise ValueError("Invalid month selected")
 
-        date_of_payment = dop if dop else timezone.now()
+        # Convert the year to an integer
+        year = int(year)
 
         # Create FeeDetail entry
         fee_detail = FeeDetail(
             customer=customer,
             amount_paid=amount,
-            date_of_payment=date_of_payment,
+            date_of_payment=dop if dop else timezone.now(),
             category=category,
             month=month,
-            year=timezone.now().year
+            year=year  # Save the selected year
         )
         fee_detail.save()
 
@@ -260,5 +272,17 @@ def pay_fees(request, customer_id):
     # If the request is GET, show the form
     context = {
         'customer': customer,
+        'years': years  # Pass the list of years to the template
     }
     return render(request, 'gym/pay_fees.html', context)
+
+
+def customer_fee_details(request, customer_id):
+    customer = get_object_or_404(Customer, pk=customer_id)
+    fee_details = FeeDetail.objects.filter(customer=customer).order_by('year', 'month')
+    
+    context = {
+        'customer': customer,
+        'fee_details': fee_details,
+    }
+    return render(request, 'gym/customer_fee_details.html', context)

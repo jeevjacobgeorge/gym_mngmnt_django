@@ -63,12 +63,12 @@
                                 <label for="amount">Amount</label>
                                 <input type="number" name="amount" id="amount" placeholder="Enter Amount Paid" required>
                             </div>
-                        </div>
-                        <div class="row4">
                             <div class="formGroup">
                                 <label for="dop">Date of Payment</label>
                                 <input type="date" name="dop" id="dop" required>
                             </div>
+                        </div>
+                        <div class="row4">
                             <div class="formGroup">
                                 <label for="month">Select Month</label>
                                 <select name="month" id="month" required>
@@ -87,7 +87,17 @@
                                     <option value="December">December</option>
                                 </select>
                             </div>
+                            <div class="formGroup">
+                                <label for="year">Select Year</label>
+                                <select name="year" id="year" required>
+                                    
+                                    {% for year in years %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
+                        
                     </div>
                     <div class="formGroup">
                         <input type="submit" class="submitForm" value="Mark as Paid">
