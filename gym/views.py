@@ -99,16 +99,23 @@ def fee_details(request):
     except ValueError:
         year = timezone.now().year
 
-    # Get the current month and handle months across the year boundary
-    current_month = datetime.now().month + 3
-    months_to_show = [(current_month - i) % 12 or 12 for i in range(2, -1, -1)]
+    # Get the current date and month
+    current_date = datetime.now()
+    current_month = current_date.month 
+    current_year = current_date.year
 
-    # Get the corresponding years for those months
+    # Calculate last four months including possible year transitions
     months_and_years = []
-    for i, month in enumerate(months_to_show):
-        # If the month is ahead of the current month, it means it belongs to the previous year
-        year_for_month = year - 1 if month > current_month else year
-        months_and_years.append((month, year_for_month))
+    for i in range(3):  # Show 3 past months + current
+        month_offset = current_month - i
+        if month_offset <= 0:
+            # Handle previous year case
+            month = 12 + month_offset  # Negative values will wrap around to previous year
+            year_to_add = current_year - 1
+        else:
+            month = month_offset
+            year_to_add = current_year
+        months_and_years.append((month, year_to_add))
 
     # Map month numbers to their abbreviations
     month_abbreviations = {
@@ -138,7 +145,7 @@ def fee_details(request):
                 fees_status[month_abbreviations[month]] = 'Not Paid'
 
         # Only include customers who have paid for at least one month in the last 4 months
-        if paid_count > 0:
+        if paid_count > 0 or search_query:
             active_customers.append({
                 'customer': {
                     'id': customer.pk,
@@ -151,7 +158,7 @@ def fee_details(request):
 
     # Sort customers by activity (paid_count in descending order)
     active_customers.sort(key=lambda x: x['paid_count'], reverse=True)
-
+    
     context = {
         'customers': active_customers,
         'months': months,
@@ -164,7 +171,6 @@ def fee_details(request):
 
     # Render the HTML template for non-AJAX requests
     return render(request, 'gym/feeDetails.html', context)
-
 
 @login_required
 def profile_view(request, customer_id):
@@ -228,7 +234,7 @@ def pay_fees(request, customer_id):
     
     # Prepare the list of years (current year and previous few years)
     current_year = timezone.now().year
-    years = list(range(current_year, current_year - 5, -1))  # e.g., last 5 years
+    years = list(range(current_year, current_year + 2))  # e.g., last 1 year and next year
 
     if request.method == 'POST':
         category = request.POST.get('category')
