@@ -121,7 +121,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 20px;
 }
 
-.row1,.row2,.row3,.row4{
+.formBody{
+    display:flex;
+    flex-direction:column;
+}
+
+.row1,.row2,.row3,.row4,.row5{
     display:flex;
     flex-wrap: wrap;
 }
