@@ -90,7 +90,8 @@ def fee_details(request):
     if search_query:
         customers = customers.filter(
             models.Q(name__icontains=search_query) |
-            models.Q(admission_number__icontains=search_query)
+            models.Q(admission_number__icontains=search_query) |
+            models.Q(phone_no__icontains=search_query)
         )
 
     # Validate year
@@ -171,6 +172,40 @@ def fee_details(request):
 
     # Render the HTML template for non-AJAX requests
     return render(request, 'gym/feeDetails.html', context)
+
+
+@login_required
+def dedicated(request):
+    gender = request.GET.get('gender', 'select')
+    search_query = request.GET.get('search', '').strip()
+
+    # Filter customers by gender
+    # customers = Customer.objects.all()
+    customers = None
+    if gender != 'select':
+        customers = customers.filter(gender=gender)
+
+    # Filter customers by search query for name or membership ID
+    print(search_query)
+    if len(search_query)>0:
+        customers = customers.filter(
+            models.Q(name__icontains=search_query) |
+            models.Q(admission_number__icontains=search_query) |
+            models.Q(phone_no__icontains=search_query)  
+        )
+
+
+
+    context = {
+        'customers': customers,
+    }
+
+    # Return JSON response for AJAX requests
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse(context)
+
+    # Render the HTML template for non-AJAX requests
+    return render(request, 'gym/dedicatedpage.html', context)
 
 @login_required
 def profile_view(request, customer_id):

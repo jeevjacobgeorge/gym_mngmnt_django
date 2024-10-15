@@ -12,5 +12,6 @@ urlpatterns = [
     path('profile/<int:customer_id>/', profile_view, name='profile'),
     path('edit/<int:customer_id>/', edit_customer, name='edit_customer'),
     path('customer/<int:customer_id>/fees/', customer_fee_details, name='customer_fee_details'),
+    path('search_customer/', dedicated, name='dedicated'),
 
 ]
