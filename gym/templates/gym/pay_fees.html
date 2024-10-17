@@ -62,7 +62,7 @@
                         <div class="row3">
                             <div class="formGroup">
                                 <label for="amount">Amount</label>
-                                <input type="number" name="amount" id="amount" placeholder="Enter Amount Paid" required>
+                                <input type="number" name="amount" id="amount" placeholder="{Enter Amount Paid}" required>
                             </div>
                             <div class="formGroup">
                                 <label for="dop">Date of Payment</label>
@@ -116,6 +116,12 @@
             const currentMonth = today.toLocaleString('default', { month: 'long' });
             document.querySelector(`#month option[value="${currentMonth}"]`).selected = true;
         });
+        let amt = document.getElementById('amount')
+        document.addEventListener(cat,function(){
+            let cat = document.getElementById('category');
+            amt.value = data.category[cat.value];
+        })
+
     </script>
     <script src="https://kit.fontawesome.com/570d6d8240.js" crossorigin="anonymous"></script>
 </body>

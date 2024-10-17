@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Customer, FeeDetail
+from .models import Customer, FeeDetail, CategoryTable
 # from .forms import CustomerForm, FeePaymentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -266,7 +266,7 @@ def edit_customer(request, customer_id):
 @login_required
 def pay_fees(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
-    
+    category_data = CategoryTable()
     # Prepare the list of years (current year and previous few years)
     current_year = timezone.now().year
     years = list(range(current_year, current_year + 2))  # e.g., last 1 year and next year
@@ -313,7 +313,8 @@ def pay_fees(request, customer_id):
     # If the request is GET, show the form
     context = {
         'customer': customer,
-        'years': years  # Pass the list of years to the template
+        'years': years,  # Pass the list of years to the template
+        'category': category_data
     }
     return render(request, 'gym/pay_fees.html', context)
 

@@ -16,6 +16,7 @@
             <nav>
                 <a href="{% url 'dashboard' %}"><li><i class="fa-solid fa-house" style="color: #9a9a9a;"></i>Dashboard</li></a>
                 <a href="/add"><li><i class="fa-solid fa-file"></i>New Customer</li></a>
+                <a href="{% url 'dedicated' %}"><li><i class="fa-solid fa-search" style="color: #9a9a9a;"></i>Find Customer</li></a>
                 <a href="{% url 'feeDetails' %}" ><li><i class="fa-solid fa-circle-info" style="color: #9a9a9a;"></i>Fee Details</li></a>
             </nav>
         </div>
@@ -65,7 +66,6 @@
                         <h2>Other Details</h2>
                         <div class="other">
                             <h4><b>Date of Joining:</b> {{ doj }}</h4>
-                            <h4><b>Current Subscription:</b> {{ category }}</h4>
                             <h4><b>Fees Paid Upto:</b> {{ activeMonth }}</h4>
                         </div>
                     </div>
