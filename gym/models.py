@@ -106,7 +106,10 @@ class FeeDetail(models.Model):
     category = models.CharField(choices=Customer.Fees_Type, max_length=2, default=Customer.Fees)
     month = models.PositiveSmallIntegerField(choices=MONTH_CHOICES, default=timezone.now().month)
     year = models.IntegerField(default=timezone.now().year)
-    
+    #unique together month year and category
+    class Meta:
+        unique_together = ('month', 'year',
+                            'category', 'customer')
 
     def __str__(self):
         return f"{self.customer.name} - {self.get_month_display()} - {self.amount_paid}"

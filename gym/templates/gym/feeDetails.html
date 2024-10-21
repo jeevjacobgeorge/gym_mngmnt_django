@@ -154,8 +154,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Append action buttons
                 let actionRow = document.createElement('tr');
                 actionRow.innerHTML = `
-                <td><a href="/customer/${customerDataObj.customer.id}/fees/">View Transactions</a></td> <!-- New button to view transactions -->
-                    <td><a href="/pay_fees/${customerDataObj.customer.id}">Pay Fees</a></td>
+                                <td>
+                                    <a href="/customer/${customerDataObj.customer.id}/fees/">
+                                        <button type="button">View Transactions</button>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="/pay_fees/${customerDataObj.customer.id}">
+                                        <button type="button">Pay Fees</button>
+                                    </a>
+                                </td>
                 `;
                 actionButtons.appendChild(actionRow);
             });
