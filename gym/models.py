@@ -1,6 +1,12 @@
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
+class CategoryTable(models.Model):
+    name = models.CharField(max_length=50)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def __str__(self):
+        return self.name
 class Customer(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),
@@ -28,15 +34,8 @@ class Customer(models.Model):
     ]
 
 
-    Fees = 'F'
-    Admission = 'A'
-    Other = 'O'
 
-    Fees_Type = [
-        (Fees, 'Fees'),
-        (Admission, 'Admission'),
-        (Other, 'Other'),
-    ]
+
 
     unique_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255,blank=False)
@@ -103,20 +102,18 @@ class FeeDetail(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     date_of_payment = models.DateField(default=timezone.now)
-    category = models.CharField(choices=Customer.Fees_Type, max_length=2, default=Customer.Fees)
+    category = models.ForeignKey(CategoryTable,on_delete=models.PROTECT)
     month = models.PositiveSmallIntegerField(choices=MONTH_CHOICES, default=timezone.now().month)
     year = models.IntegerField(default=timezone.now().year)
     #unique together month year and category
     class Meta:
         unique_together = ('month', 'year',
                             'category', 'customer')
-
+        
+    def delete(self, *args, **kwargs):
+        # Prevent deletion if the category name is 'Fees'
+        if self.name == 'Fees':
+            raise ValidationError("Cannot delete the 'Fees' category.")
+        super().delete(*args, **kwargs)
     def __str__(self):
         return f"{self.customer.name} - {self.get_month_display()} - {self.amount_paid}"
-
-class CategoryTable(models.Model):
-    name = models.CharField(choices=Customer.Fees_Type, max_length=2, default=Customer.Fees)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return self.get_name_display()

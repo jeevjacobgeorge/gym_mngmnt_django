@@ -1,3 +1,4 @@
+
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -9,16 +10,56 @@ from django.contrib.auth.forms import AuthenticationForm
 import datetime
 from datetime import datetime
 from django.db import models
+
 @login_required
 def dashboard(request):
-    data ={}
+    data = {}
     data['no_of_customers'] = Customer.objects.count()
     data['no_of_male'] = Customer.objects.filter(gender='M').count()
     data['no_of_female'] = Customer.objects.filter(gender='F').count()
-    all_customers = Customer.objects.all()
-    active_customers = [customer for customer in all_customers if customer.is_active]
-    data['no_of_active'] = len(active_customers)
-    return render(request, 'gym/dashboard.html',data)
+
+    # Calculate the last 3 months including potential year transitions
+    current_date = datetime.now()
+    current_month = current_date.month
+    current_year = current_date.year
+
+    # Generate month and year combinations for the last 3 months
+    months_and_years = []
+    for i in range(3):  # Adjust for 3 past months
+        month_offset = current_month - i
+        if month_offset <= 0:
+            month = 12 + month_offset
+            year_to_add = current_year - 1
+        else:
+            month = month_offset
+            year_to_add = current_year
+        months_and_years.append((month, year_to_add))
+
+    # Filter active male and female customers who paid within the last 3 months
+    active_male_count = 0
+    active_female_count = 0
+
+    for customer in Customer.objects.all():
+        paid_count = 0  # Track payments for each customer
+
+        # Check if the customer has any FeeDetail entry in the last 3 months
+        for month, year in months_and_years:
+            if FeeDetail.objects.filter(customer=customer, month=month, year=year).exists():
+                paid_count += 1
+
+        # If paid in any month of the last 3 months, count as active
+        if paid_count > 0:
+            if customer.gender == 'M':
+                active_male_count += 1
+            elif customer.gender == 'F':
+                active_female_count += 1
+
+    # Populate active counts
+    data['no_of_active_males'] = active_male_count
+    data['no_of_active_females'] = active_female_count
+
+    return render(request, 'gym/dashboard.html', data)
+
 
 def logout_view(request):
     logout(request)
@@ -136,10 +177,11 @@ def fee_details(request):
 
         for month, month_year in months_and_years:
             # Fetch the FeeDetail object for the specific month and year
-            fee_detail = FeeDetail.objects.filter(customer=customer, year=month_year, month=month).first()
+            fee_id = get_object_or_404(CategoryTable,name='Fees')
+            fee_detail = FeeDetail.objects.filter(customer=customer, year=month_year, month=month,category=fee_id.pk).first()
             if fee_detail:
                 # If fee is paid, store the category and increment paid_count
-                fees_status[month_abbreviations[month]] = fee_detail.get_category_display()
+                fees_status[month_abbreviations[month]] = 'Paid'
                 paid_count += 1
             else:
                 # If no fee is paid, store 'Not Paid'
@@ -266,18 +308,18 @@ def edit_customer(request, customer_id):
 @login_required
 def pay_fees(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
-    category_data = CategoryTable()
+    categories = CategoryTable.objects.values('id', 'name').distinct()
     # Prepare the list of years (current year and previous few years)
     current_year = timezone.now().year
     years = list(range(current_year, current_year + 2))  # e.g., last 1 year and next year
 
     if request.method == 'POST':
-        category = request.POST.get('category')
+        category_id = request.POST.get('category')
         amount = request.POST.get('amount')
         month = request.POST.get('month')
         year = request.POST.get('year')  # Get the year from the form
         dop = request.POST.get('dop')
-        
+        category_instance = get_object_or_404(CategoryTable, id=category_id)
         # Parse the form inputs to the appropriate types
         amount = float(amount)
         
@@ -301,7 +343,7 @@ def pay_fees(request, customer_id):
             customer=customer,
             amount_paid=amount,
             date_of_payment=dop if dop else timezone.now(),
-            category=category,
+            category=category_instance,
             month=month,
             year=year  # Save the selected year
         )
@@ -314,7 +356,8 @@ def pay_fees(request, customer_id):
     context = {
         'customer': customer,
         'years': years,  # Pass the list of years to the template
-        'category': category_data
+        'categories':categories
+
     }
     return render(request, 'gym/pay_fees.html', context)
 
@@ -328,3 +371,10 @@ def customer_fee_details(request, customer_id):
         'fee_details': fee_details,
     }
     return render(request, 'gym/customer_fee_details.html', context)
+
+
+
+def get_fees(request, id):
+    category = get_object_or_404(CategoryTable, pk=id)
+    return JsonResponse({'fee': category.price})
+

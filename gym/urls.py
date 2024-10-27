@@ -13,5 +13,6 @@ urlpatterns = [
     path('edit/<int:customer_id>/', edit_customer, name='edit_customer'),
     path('customer/<int:customer_id>/fees/', customer_fee_details, name='customer_fee_details'),
     path('search_customer/', dedicated, name='dedicated'),
+    path('get_fees/<int:id>/', get_fees, name='get_fees'),
 
 ]

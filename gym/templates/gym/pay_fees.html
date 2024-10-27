@@ -47,8 +47,8 @@
                                 <label for="category">Category</label>
                                 <select name="category" id="category" required>
                                     <option value="">--Select--</option>
-                                    {% for fee_type in customer.Fees_Type %}
-                                        <option value="{{ fee_type.0 }}">{{ fee_type.1 }}</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -116,12 +116,21 @@
             const currentMonth = today.toLocaleString('default', { month: 'long' });
             document.querySelector(`#month option[value="${currentMonth}"]`).selected = true;
         });
-        let amt = document.getElementById('amount')
-        document.addEventListener(cat,function(){
-            let cat = document.getElementById('category');
-            amt.value = data.category[cat.value];
-        })
 
+        let categorySelect = document.getElementById('category');
+        let amountField = document.getElementById('amount');
+
+        categorySelect.addEventListener('change', function () {
+            let categoryName = categorySelect.value;
+
+            // Fetch the fee from the server
+            fetch(`/get_fees/${categoryName}/`)
+                .then(response => response.json())
+                .then(data => {
+                    amountField.value = data.fee;
+                })
+                .catch(error => console.error('Error:', error));
+        });
     </script>
     <script src="https://kit.fontawesome.com/570d6d8240.js" crossorigin="anonymous"></script>
 </body>
