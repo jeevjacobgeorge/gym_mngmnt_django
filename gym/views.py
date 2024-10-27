@@ -17,7 +17,7 @@ def dashboard(request):
     data['no_of_customers'] = Customer.objects.count()
     data['no_of_male'] = Customer.objects.filter(gender='M').count()
     data['no_of_female'] = Customer.objects.filter(gender='F').count()
-
+    fee_id = get_object_or_404(CategoryTable,name='Fees')
     # Calculate the last 3 months including potential year transitions
     current_date = datetime.now()
     current_month = current_date.month
@@ -44,7 +44,7 @@ def dashboard(request):
 
         # Check if the customer has any FeeDetail entry in the last 3 months
         for month, year in months_and_years:
-            if FeeDetail.objects.filter(customer=customer, month=month, year=year).exists():
+            if FeeDetail.objects.filter(customer=customer, month=month, year=year,category=fee_id.pk).exists():
                 paid_count += 1
 
         # If paid in any month of the last 3 months, count as active
